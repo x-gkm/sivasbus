@@ -31,7 +31,7 @@ class Scraper:
             human_names.append(" ".join(tag.text.strip().split()[:-1]))
             counts.append(int(tag.find("span").text))
         
-        return pd.DataFrame({ "name": names, "human_name": human_names, "count": counts })
+        return pd.DataFrame({ "name": names, "human_name": human_names, "count": counts }).sort_values(by=["count"], ascending=False)
 
     def get_live_buses(self, lines: str | list[str]):
         if isinstance(lines, str):
