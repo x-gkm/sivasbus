@@ -104,3 +104,6 @@ class Scraper:
             }) \
             .loc[:, ["license_plate", "route", "route_code", "station", "arrive_time_minutes"]] \
             .set_index("license_plate")
+    
+    def get_live_buses_for_station(self, station, lines: str | list[str]):
+        return self.get_live_station(station).merge(self.get_live_buses(lines).drop(columns=["route"]), on = "license_plate").sort_values(by=["arrive_time_minutes"])
