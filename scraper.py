@@ -42,7 +42,9 @@ class Scraper:
         payload = {"hgID": id, "__RequestVerificationToken": token}
 
         response = self.session.post(f"{SITE_ROOT}/aractekrar", data=payload)
-        return pd.read_json(io.BytesIO(response.content)) \
+        df = pd.read_json(io.BytesIO(response.content))
+        if df.empty: return df
+        return df \
             .rename(columns={
                 "aracPlaka": "license_plate",
                 "mevcutlat": "lat",
@@ -78,7 +80,9 @@ class Scraper:
         payload = {"drkID": station, "__RequestVerificationToken": token}
 
         response = self.session.post(f"{SITE_ROOT}/durakTekrar", data=payload)
-        return pd.read_json(io.BytesIO(response.content)) \
+        df = pd.read_json(io.BytesIO(response.content))
+        if df.empty: return df
+        return df \
             .rename(columns={
                 "plaka": "license_plate",
                 "hatAd": "route",
