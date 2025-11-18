@@ -20,13 +20,17 @@ class Scraper:
     def get_lines(self):
         response = self.session.get(SITE_ROOT)
         soup = BeautifulSoup(response.text, "html5lib")
+
         tags = soup.select('a[href^="/hat/"]')
-        result = []
+        names = []
+        human_names = []
+        counts = []
         for tag in tags:
-            path = tag["href"]
-            line = path.split("/")[-1]
-            result.append(line)
-        return result
+            names.append(tag["href"].split("/")[-1])
+            human_names.append(" ".join(tag.text.strip().split()[:-1]))
+            counts.append(int(tag.find("span").text))
+        
+        return pd.DataFrame({ "name": names, "human_name": human_names, "count": counts })
 
     def get_live_buses(self, line: str):
         response = self.session.get(f"{SITE_ROOT}/hat/{line}")
