@@ -1,5 +1,6 @@
 import re
 import io
+import time
 
 import requests
 from bs4 import BeautifulSoup
@@ -32,7 +33,18 @@ class Scraper:
         
         return pd.DataFrame({ "name": names, "human_name": human_names, "count": counts })
 
-    def get_live_buses(self, line: str):
+    def get_live_buses(self, lines: str | list[str]):
+        if isinstance(lines, str):
+            lines = [lines]
+        
+        result = []
+        for line in lines:
+            result.append(self._get_single_live_line(line))
+            time.sleep(0.2)
+
+        return pd.concat(result)
+
+    def _get_single_live_line(self, line: str):
         response = self.session.get(f"{SITE_ROOT}/hat/{line}")
         doc = response.text
 
