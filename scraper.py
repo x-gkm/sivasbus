@@ -20,6 +20,7 @@ class Scraper:
 
     def get_lines(self):
         response = self.session.get(SITE_ROOT)
+        time.sleep(0.2)
         soup = BeautifulSoup(response.text, "html5lib")
 
         tags = soup.select('a[href^="/hat/"]')
@@ -40,12 +41,12 @@ class Scraper:
         result = []
         for line in lines:
             result.append(self._get_single_live_line(line))
-            time.sleep(0.2)
 
         return pd.concat(result)
 
     def _get_single_live_line(self, line: str):
         response = self.session.get(f"{SITE_ROOT}/hat/{line}")
+        time.sleep(0.2)
         doc = response.text
 
         id = int(re.search(r"hgID: (\d+)", doc).group(1))
@@ -54,6 +55,7 @@ class Scraper:
         payload = {"hgID": id, "__RequestVerificationToken": token}
 
         response = self.session.post(f"{SITE_ROOT}/aractekrar", data=payload)
+        time.sleep(0.2)
         df = pd.read_json(io.BytesIO(response.content))
         if df.empty: return df
         return df \
@@ -68,6 +70,7 @@ class Scraper:
     
     def get_stations(self):
         response = self.session.get(f"{SITE_ROOT}/Akilli-Duraklar-Liste")
+        time.sleep(0.2)
         soup = BeautifulSoup(response.text, "html5lib")
 
         tags = soup.select('a[href^="/Akilli-Durak/"]')
@@ -87,11 +90,13 @@ class Scraper:
 
     def get_live_station(self, station):
         response = self.session.get(f"{SITE_ROOT}/Akilli-Durak/{station}")
+        time.sleep(0.2)
         token = extract_token(response.text)
 
         payload = {"drkID": station, "__RequestVerificationToken": token}
 
         response = self.session.post(f"{SITE_ROOT}/durakTekrar", data=payload)
+        time.sleep(0.2)
         df = pd.read_json(io.BytesIO(response.content))
         if df.empty: return df
         return df \
