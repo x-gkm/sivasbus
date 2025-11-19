@@ -105,5 +105,19 @@ class Scraper:
             .loc[:, ["license_plate", "route", "route_code", "station", "arrive_time_minutes"]] \
             .set_index("license_plate")
     
-    def get_live_buses_for_station(self, station, lines: str | list[str]):
-        return self.get_live_station(station).merge(self.get_live_buses(lines).drop(columns=["route"]), on = "license_plate").sort_values(by=["arrive_time_minutes"])
+    def get_live_buses_for_stations(self, station_ids: int | list[int], lines: str | list[str]):
+        if isinstance(station_ids, int):
+            station_ids = [station_ids]
+
+        return pd.concat(self._get_live_buses_for_single_station(station_id, lines) for station_id in station_ids)
+
+    def _get_live_buses_for_single_station(self, station_id, lines: str | list[str]):
+        station = self.get_live_station(station_id)
+        if station.empty: return pd.DataFrame()
+
+        buses = self.get_live_buses(lines)
+        if buses.empty: return pd.DataFrame()
+
+        buses.drop(columns=["route"], inplace=True)
+
+        return station.merge(buses, on = "license_plate").sort_values(by=["arrive_time_minutes"])
