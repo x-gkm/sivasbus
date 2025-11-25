@@ -215,11 +215,7 @@ impl Client {
             )
             .await?;
 
-        let mut results = vec![];
-        for dto in dtos {
-            results.push(dto.try_into()?);
-        }
-        Ok(results)
+        map_try_into(dtos)
     }
 
     pub async fn get_station_buses(&self, station: i32) -> Result<Vec<StationBus>> {
@@ -287,9 +283,15 @@ fn extract_stations(doc: &str) -> Result<Vec<Station>> {
     let json = extract_station_json(doc).ok_or(Error::NoStations)?;
     let dtos = serde_json::from_str::<Vec<StationDto>>(json)?;
 
-    let mut results = vec![];
-    for dto in dtos {
-        results.push(dto.try_into()?);
-    }
-    Ok(results)
+    map_try_into(dtos)
+}
+
+fn map_try_into<T, E, U>(v: Vec<T>) -> Result<Vec<U>, E>
+where
+    T: TryInto<U>,
+    E: From<<T as TryInto<U>>::Error>,
+{
+    Ok(v.into_iter()
+        .map(TryInto::try_into)
+        .collect::<Result<_, _>>()?)
 }
