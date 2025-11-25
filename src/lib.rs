@@ -157,7 +157,8 @@ impl Client {
     }
 
     async fn get_document(&self, path: String) -> Result<String, reqwest::Error> {
-        let result = self.0
+        let result = self
+            .0
             .get(format!("{SITE_ROOT}{path}"))
             .send()
             .await?
@@ -174,7 +175,8 @@ impl Client {
         path: &str,
         params: Vec<(&str, &str)>,
     ) -> Result<T, reqwest::Error> {
-        let result = self.0
+        let result = self
+            .0
             .post(format!("{SITE_ROOT}{path}"))
             .form(&params)
             .send()
@@ -233,9 +235,7 @@ impl Client {
             )
             .await?;
 
-        let results = json.into_iter().map(|dto| dto.into()).collect();
-
-        Ok(results)
+        Ok(json.into_iter().map(Into::into).collect())
     }
 }
 
