@@ -157,12 +157,16 @@ impl Client {
     }
 
     async fn get_document(&self, path: String) -> Result<String, reqwest::Error> {
-        self.0
+        let result = self.0
             .get(format!("{SITE_ROOT}{path}"))
             .send()
             .await?
             .text()
-            .await
+            .await?;
+
+        tokio::time::sleep(Duration::from_millis(200)).await;
+
+        Ok(result)
     }
 
     async fn post_json<T: for<'de> Deserialize<'de>>(
@@ -170,13 +174,17 @@ impl Client {
         path: &str,
         params: Vec<(&str, &str)>,
     ) -> Result<T, reqwest::Error> {
-        self.0
+        let result = self.0
             .post(format!("{SITE_ROOT}{path}"))
             .form(&params)
             .send()
             .await?
             .json()
-            .await
+            .await?;
+
+        tokio::time::sleep(Duration::from_millis(200)).await;
+
+        Ok(result)
     }
 
     pub async fn get_lines(&self) -> Result<Vec<Line>> {
