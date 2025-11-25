@@ -77,14 +77,14 @@ struct StationBusDto {
     #[serde(rename = "plaka")]
     license_plate: String,
     #[serde(rename = "sure")]
-    arrive_time_secs: u64,
+    arrive_time_mins: u64,
 }
 
 impl From<StationBusDto> for StationBus {
     fn from(dto: StationBusDto) -> StationBus {
         StationBus {
             license_plate: dto.license_plate.trim().to_string(),
-            arrive_time: Duration::from_secs(dto.arrive_time_secs),
+            arrive_time: Duration::from_secs(60 * dto.arrive_time_mins),
         }
     }
 }
