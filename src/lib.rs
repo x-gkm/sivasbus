@@ -278,7 +278,7 @@ fn extract_lines(doc: &str) -> Vec<Line> {
 
 fn extract_station_json(doc: &str) -> Option<&str> {
     Some(
-        Regex::new(r"var\s+duraks\s*=\s*(\[.*\])")
+        Regex::new(r"var\s+duraklar\s*=\s*(\[.*\])")
             .unwrap()
             .captures(doc)?
             .get(1)?
