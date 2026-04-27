@@ -6,6 +6,12 @@ use thiserror::Error;
 
 const SITE_ROOT: &str = "https://ulasim.sivas.bel.tr";
 
+const USER_AGENT: &str = concat!(
+    env!("CARGO_PKG_NAME"),
+    "/",
+    env!("CARGO_PKG_VERSION"),
+);
+
 #[derive(Error, Debug)]
 pub enum Error {
     #[error("request error")]
@@ -151,6 +157,7 @@ impl Client {
         Client(
             reqwest::Client::builder()
                 .cookie_store(true)
+                .user_agent(USER_AGENT)
                 .build()
                 .unwrap(),
         )
