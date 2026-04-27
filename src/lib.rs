@@ -1,7 +1,7 @@
 use regex::Regex;
 use scraper::{Element, Html, Selector};
 use serde::{Deserialize, Serialize};
-use std::time::Duration;
+use std::{sync::LazyLock, time::Duration};
 use thiserror::Error;
 
 const SITE_ROOT: &str = "https://ulasim.sivas.bel.tr";
@@ -242,28 +242,30 @@ impl Client {
     }
 }
 
+static TOKEN_SELECTOR: LazyLock<Selector> =
+    LazyLock::new(|| Selector::parse(r#"input[name="__RequestVerificationToken"]"#).unwrap());
+
 fn extract_token(doc: &str) -> Option<String> {
-    let selector = Selector::parse(r#"input[name="__RequestVerificationToken"]"#).unwrap();
     let html = Html::parse_document(doc);
-    let elem = html.select(&selector).next()?;
+    let elem = html.select(&TOKEN_SELECTOR).next()?;
     let token = elem.attr("value")?;
 
     Some(token.to_string())
 }
 
+static LINE_ID_REGEX: LazyLock<Regex> =
+    LazyLock::new(|| Regex::new(r"(var|let|const)\s*hatGrupID\s*=\s*(\d+)").unwrap());
+
 fn extract_line_id(doc: &str) -> Option<&str> {
-    Some(
-        Regex::new(r"(var|let|const)\s*hatGrupID\s*=\s*(\d+)")
-            .unwrap()
-            .captures(&doc)?
-            .get(2)?
-            .as_str(),
-    )
+    Some(LINE_ID_REGEX.captures(&doc)?.get(2)?.as_str())
 }
+
+static LINE_LINK_SELECTOR: LazyLock<Selector> =
+    LazyLock::new(|| Selector::parse(r#"a[href^="/hat/"]"#).unwrap());
 
 fn extract_lines(doc: &str) -> Vec<Line> {
     Html::parse_document(doc)
-        .select(&Selector::parse(r#"a[href^="/hat/"]"#).unwrap())
+        .select(&LINE_LINK_SELECTOR)
         .filter_map(|elem| {
             let id = elem.attr("href")?.split("/").last()?.to_string();
             let human_name = elem
@@ -278,14 +280,11 @@ fn extract_lines(doc: &str) -> Vec<Line> {
         .collect()
 }
 
+static STATION_JSON_REGEX: LazyLock<Regex> =
+    LazyLock::new(|| Regex::new(r"(var|let|const)\s+duraklar\s*=\s*(\[.*\])").unwrap());
+
 fn extract_station_json(doc: &str) -> Option<&str> {
-    Some(
-        Regex::new(r"(var|let|const)\s+duraklar\s*=\s*(\[.*\])")
-            .unwrap()
-            .captures(doc)?
-            .get(2)?
-            .as_str(),
-    )
+    Some(STATION_JSON_REGEX.captures(doc)?.get(2)?.as_str())
 }
 
 fn extract_stations(doc: &str) -> Result<Vec<Station>> {
