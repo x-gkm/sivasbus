@@ -234,7 +234,7 @@ impl Client {
         let token = extract_token(&doc).ok_or(Error::NoToken)?;
         let json: Vec<StationBusDto> = self
             .post_json(
-                "/durakTekrar",
+                "/akillidurakTekrar",
                 vec![
                     ("drkID", &station.to_string()),
                     ("__RequestVerificationToken", &token),
