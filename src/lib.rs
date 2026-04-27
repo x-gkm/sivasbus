@@ -257,10 +257,10 @@ fn extract_token(doc: &str) -> Option<String> {
 
 fn extract_line_id(doc: &str) -> Option<&str> {
     Some(
-        Regex::new(r"hgID\s*:\s*(\d+)")
+        Regex::new(r"(var|let|const)\s*hatGrupID\s*=\s*(\d+)")
             .unwrap()
             .captures(&doc)?
-            .get(1)?
+            .get(2)?
             .as_str(),
     )
 }
