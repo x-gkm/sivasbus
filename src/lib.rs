@@ -1,16 +1,12 @@
 use regex::Regex;
-use scraper::{Html, Selector};
+use scraper::{Element, Html, Selector};
 use serde::{Deserialize, Serialize};
 use std::time::Duration;
 use thiserror::Error;
 
 const SITE_ROOT: &str = "https://ulasim.sivas.bel.tr";
 
-const USER_AGENT: &str = concat!(
-    env!("CARGO_PKG_NAME"),
-    "/",
-    env!("CARGO_PKG_VERSION"),
-);
+const USER_AGENT: &str = concat!(env!("CARGO_PKG_NAME"), "/", env!("CARGO_PKG_VERSION"),);
 
 #[derive(Error, Debug)]
 pub enum Error {
@@ -270,7 +266,13 @@ fn extract_lines(doc: &str) -> Vec<Line> {
         .select(&Selector::parse(r#"a[href^="/hat/"]"#).unwrap())
         .filter_map(|elem| {
             let id = elem.attr("href")?.split("/").last()?.to_string();
-            let human_name = elem.text().next()?.trim().to_string();
+            let human_name = elem
+                .prev_sibling_element()?
+                .first_element_child()?
+                .text()
+                .collect::<String>()
+                .trim()
+                .to_string();
             Some(Line { id, human_name })
         })
         .collect()
