@@ -28,13 +28,13 @@ pub enum Error {
 
 type Result<T, E = Error> = std::result::Result<T, E>;
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Coords {
     pub lat: f64,
     pub long: f64,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct LineBus {
     pub license_plate: String,
     pub coords: Coords,
@@ -68,7 +68,7 @@ impl TryFrom<LineBusDto> for LineBus {
     }
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct StationBus {
     pub license_plate: String,
     pub arrive_time: Duration,
@@ -91,7 +91,7 @@ impl From<StationBusDto> for StationBus {
     }
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Station {
     pub id: i32,
     pub human_name: String,
@@ -140,7 +140,7 @@ impl TryFrom<StationDto> for Station {
     }
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Line {
     pub id: String,
     pub human_name: String,
