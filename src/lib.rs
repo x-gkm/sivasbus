@@ -168,8 +168,6 @@ impl Client {
             .text()
             .await?;
 
-        tokio::time::sleep(Duration::from_millis(200)).await;
-
         Ok(result)
     }
 
@@ -186,8 +184,6 @@ impl Client {
             .await?
             .json()
             .await?;
-
-        tokio::time::sleep(Duration::from_millis(200)).await;
 
         Ok(result)
     }
