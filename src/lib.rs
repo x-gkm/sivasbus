@@ -146,6 +146,7 @@ pub struct Line {
     pub human_name: String,
 }
 
+#[derive(Debug, Clone)]
 pub struct Client(reqwest::Client);
 
 impl Client {
