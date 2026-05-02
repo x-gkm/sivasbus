@@ -149,8 +149,8 @@ pub struct Line {
 #[derive(Debug, Clone)]
 pub struct Client(reqwest::Client);
 
-impl Client {
-    pub fn new() -> Client {
+impl Default for Client {
+    fn default() -> Self {
         Client(
             reqwest::Client::builder()
                 .cookie_store(true)
@@ -158,6 +158,12 @@ impl Client {
                 .build()
                 .unwrap(),
         )
+    }
+}
+
+impl Client {
+    pub fn new() -> Client {
+        Client::default()
     }
 
     async fn get_document(&self, path: String) -> Result<String, reqwest::Error> {
